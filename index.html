@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>X0</title>
+</head>
+<body>
+<style>
+  .cell {
+    width: 20px;
+    height: 20px;
+    border: 1px solid;
+    position: relative;
+    text-align: center;
+  }
+
+  table {
+    border: 1px solid;
+  }
+
+  .X::before {
+    content: 'X';
+  }
+
+  .O::before {
+    content: '0';
+  }
+</style>
+<table cellpadding="0" cellspacing="0">
+  <tbody></tbody>
+</table>
+<script>
+  // create table
+  var cells = prompt('Enter cells 3 & more') || 3;
+  var field = (new Array(+cells * cells)).fill(0);
+  var player = 'X';
+  document
+    .getElementsByTagName('tbody')[0]
+    .innerHTML =
+    (new Array(+cells)).fill(0)
+      .map(
+        (_, i, array) =>
+          `<tr>${
+            array.map(
+              (_, j) => `<td id="${(i * cells) + j}" class="cell"></td>`
+            ).join('')
+            }</tr>`
+      )
+      .join('');
+
+  // hang clicks
+  Array.from(document.getElementsByClassName('cell')).map(
+    item => item.addEventListener('click', () => {
+      if (!(item.classList.contains('X') || item.classList.contains('O'))) {
+        item.classList.add(player);
+        field[item.id] = player;
+        if (
+          Object.values(
+            field.reduce(
+              (acc, it, id) => {
+                if (acc.c[id % +cells] === undefined) {
+                  acc.c[id % +cells] = []
+                }
+                acc.c[id % +cells].push(it);
+                if (acc.r[Math.floor(id / cells)] === undefined) {
+                  acc.r[Math.floor(id / cells)] = []
+                }
+                acc.r[Math.floor(id / cells)].push(it);
+                if (id % +cells === Math.floor(id / cells)) {
+                  acc.d[0].push(it)
+                }
+                if (id % +cells === (cells - 1 - Math.floor(id / cells))) {
+                  acc.d[1].push(it)
+                }
+                return acc
+              }, {c: [], r: [], d: [[], []]}))
+            .reduce((ac, i) => [...ac, ...i], [])
+            .filter(i => i.every(it => (i[0] !== 0 && it === i[0]))).length > 0) {
+          alert(`Player "${player}" Wins`);
+          document
+            .getElementsByTagName('tbody')[0]
+            .innerHTML = ''
+        }
+        player = player === 'X' ? 'O' : 'X';
+      }
+    })
+  )
+</script>
+</body>
+</html>
